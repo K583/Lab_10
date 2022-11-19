@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.0;
 
 interface IERC20 {
@@ -19,15 +21,14 @@ interface IERC20 {
 contract KIB is IERC20 {
 
     string public constant name = "KIB";
-    string public constant symbol = "KIB66";
-    uint8 public constant decimals = 18;
+    string public constant symbol = "KIB11";
+    uint8 public constant decimals = 2;
 
 
     mapping(address => uint256) balances;
-
     mapping(address => mapping (address => uint256)) allowed;
 
-    uint256 totalSupply_ = 10 ether;
+    uint256 totalSupply_ = 1000*(10**decimals);
 
 
    constructor() {
@@ -70,37 +71,4 @@ contract KIB is IERC20 {
         emit Transfer(owner, buyer, numTokens);
         return true;
     }
-}
-
-
-contract DEX {
-
-    event Bought(uint256 amount);
-    event Sold(uint256 amount);
-
-
-    IERC20 public token;
-
-    constructor() {
-        token = new KIB();
-    }
-
-    function buy() payable public {
-        uint256 amountTobuy = msg.value;
-        uint256 dexBalance = token.balanceOf(address(this));
-        require(amountTobuy > 0, "You need to send some ether");
-        require(amountTobuy <= dexBalance, "Not enough tokens in the reserve");
-        token.transfer(msg.sender, amountTobuy);
-        emit Bought(amountTobuy);
-    }
-
-    function sell(uint256 amount) public {
-        require(amount > 0, "You need to sell at least some tokens");
-        uint256 allowance = token.allowance(msg.sender, address(this));
-        require(allowance >= amount, "Check the token allowance");
-        token.transferFrom(msg.sender, address(this), amount);
-        payable(msg.sender).transfer(amount);
-        emit Sold(amount);
-    }
-
 }
